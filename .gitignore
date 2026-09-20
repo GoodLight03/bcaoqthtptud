@@ -9,3 +9,5 @@ target/
 firebase-service-account.json
 *.log
 .DS_Store
+.env
+src/main/resources/firebase-service-account.json
