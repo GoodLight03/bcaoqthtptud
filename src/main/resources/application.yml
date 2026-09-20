@@ -1,0 +1,24 @@
+server:
+  port: 8080
+
+spring:
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 100MB
+  application:
+    name: tthc-report
+
+# ========== ĐIỀN THÔNG SỐ FIREBASE ==========
+# 1. Tải file service account JSON từ Firebase Console
+#    Project settings > Service accounts > Generate new private key
+# 2. Đặt file vào: src/main/resources/firebase-service-account.json
+# 3. Điền project-id và bucket bên dưới (nếu dùng Storage)
+firebase:
+  enabled: true
+  # Đường dẫn tương đối trong classpath (để nguyên nếu đúng tên file)
+  credentials-path: firebase-service-account.json
+  # Ví dụ: my-project-id.appspot.com  (Firebase Console > Storage)
+  storage-bucket: YOUR_PROJECT_ID.appspot.com
+  # Tên collection lưu lịch sử báo cáo
+  collection: tthc_reports

@@ -1,0 +1,16 @@
+BUILD: 2026-09-20-v3
+FIX 07a/BTP:
+  File .xls có cột TRỐNG đầu tiên.
+  STT = cột 1, Tên đơn vị = cột 2.
+  Trước (zip cũ): cột Đơn vị hiện 10, 100, 101 (nhầm STT)
+  Sau (bản này): UBND phường Định Công, Sở Tư Pháp, ...
+
+Cách nhận zip đúng: trên header web có dòng
+  "Bản 2026-09-20-v3 — sửa cột Đơn vị mẫu 07a/BTP"
+Nếu không thấy dòng này = đang chạy bản cũ.
+
+BẮT BUỘC khi cài:
+  1. XÓA hẳn thư mục tthc-report cũ
+  2. Giải nén zip mới
+  3. mvn clean spring-boot:run
+  4. Ctrl+F5 trình duyệt

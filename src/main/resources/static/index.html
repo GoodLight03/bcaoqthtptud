@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Báo Cáo Định Kỳ</title>
+<link rel="icon" type="image/png" href="hcc.png">
+<style>
+:root{--ink:#1b2430;--muted:#5b6675;--line:#dde3ea;--paper:#fff;--bg:#eef1f5;--accent:#1f5f5b}
+*{box-sizing:border-box}body{margin:0;font-family:"Segoe UI",system-ui,Arial,sans-serif;background:var(--bg);color:var(--ink);line-height:1.45}
+.header-bar{background:linear-gradient(135deg,#e8f4f8 0%,#d0eaf2 40%,#b8e0ec 100%);border-bottom:1px solid #a8d4e0;padding:18px 24px;display:flex;align-items:center;gap:18px}
+.header-bar img{width:72px;height:72px;object-fit:contain}
+.header-text h1{margin:0 0 2px;font-size:18px;color:#0d3d4d;font-weight:700}
+.header-text .sub{margin:0;font-size:13.5px;color:#1a5a6e;font-weight:600}
+.header-text .title{margin:6px 0 0;font-size:15px;color:#0d3d4d;font-weight:600}
+main{max-width:1400px;margin:18px auto 48px;padding:0 16px}
+.panel{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:16px;margin-bottom:14px}
+.panel h2{margin:0 0 12px;font-size:14px}
+.drop{border:1.5px dashed #b7c2cf;border-radius:10px;padding:26px 14px;text-align:center;color:var(--muted);cursor:pointer}
+.drop.drag{border-color:var(--accent);background:#e6f0ef}
+input[type=file]{display:none}
+table.filelist{width:100%;border-collapse:collapse;font-size:12.2px;margin-top:12px}
+table.filelist th,table.filelist td{border:1px solid var(--line);padding:5px 7px;vertical-align:top}
+table.filelist th{background:#f6f8fa}
+.tag{display:inline-block;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:600}
+.tag.A{background:#e5edfb;color:#274a8f}.tag.B{background:#e6f0ef;color:#1f5f5b}.tag.C{background:#f3e8f9;color:#6a3a8f}.tag.unknown{background:#fbeaea;color:#a12f2f}
+.rm{border:none;background:none;color:#a12f2f;cursor:pointer;text-decoration:underline;font-size:12px}
+.row-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+button.primary{background:var(--accent);color:#fff;border:none;padding:10px 16px;border-radius:8px;font-weight:600;cursor:pointer}
+button.primary:disabled{background:#b9c3c1;cursor:not-allowed}
+button.secondary{background:#fff;border:1px solid var(--line);padding:10px 14px;border-radius:8px;cursor:pointer}
+button.linkish{border:none;background:none;color:var(--accent);cursor:pointer;text-decoration:underline;font-size:12px;padding:0 4px}
+button.danger{border:none;background:none;color:#a12f2f;cursor:pointer;text-decoration:underline;font-size:12px;padding:0 4px}
+.note{font-size:12.2px;color:var(--muted);margin-top:10px}
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-top:10px}
+.stat{background:#f6f8fa;border:1px solid var(--line);border-radius:8px;padding:10px}
+.stat .n{font-size:18px;font-weight:700}.stat .l{font-size:11.5px;color:var(--muted)}
+.report-type{display:flex;gap:28px;align-items:center;flex-wrap:wrap;margin-top:8px}
+.report-type label{display:flex;align-items:center;gap:8px;cursor:pointer;font-size:14px}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:999;align-items:center;justify-content:center;padding:16px}
+.modal-overlay.show{display:flex}
+.modal{background:#fff;border-radius:12px;width:96vw;max-width:1400px;height:90vh;display:flex;flex-direction:column;overflow:hidden}
+.modal.small{width:420px;height:auto;max-height:90vh}
+.modal-header{padding:12px 16px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
+.modal-close{border:none;background:none;font-size:22px;cursor:pointer}
+.modal-body{overflow:auto;flex:1;padding:0}
+.modal.small .modal-body{padding:16px}
+.modal-body table{width:100%;border-collapse:collapse;font-size:11.5px}
+.modal-body thead th{background:#ffe566;position:sticky;top:0;z-index:2;padding:6px 7px;border:1px solid var(--line);white-space:nowrap}
+.modal-body thead tr.sub th{top:28px;background:#fff3b0}
+.modal-body td{padding:5px 7px;border:1px solid var(--line);vertical-align:top}
+.modal-body td.num{text-align:right;font-variant-numeric:tabular-nums}
+.modal-body tr.total td{background:#eef3f0;font-weight:700}
+.modal-footer{padding:12px 16px;border-top:1px solid var(--line);display:flex;gap:10px;justify-content:flex-end}
+.form-group{margin-bottom:12px}
+.form-group label{display:block;font-size:13px;font-weight:600;margin-bottom:6px}
+.form-group input{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:8px;font-size:14px}
+footer{text-align:center;color:#8b95a1;font-size:11.5px;padding:14px 0 36px}
+.warn-box{background:#fdf0e3;color:#a4560a;border:1px solid #f0d5b4;border-radius:8px;padding:10px;margin-top:8px;font-size:12.4px}
+.bad-box{background:#fbeaea;color:#a12f2f;border:1px solid #f0c6c6;border-radius:8px;padding:10px;margin-top:8px;font-size:12.4px}
+#toastWrap{position:fixed;top:16px;right:16px;z-index:9999;display:flex;flex-direction:column;gap:8px;max-width:380px}
+.toast{padding:12px 16px;border-radius:8px;font-size:13px;box-shadow:0 8px 24px rgba(0,0,0,.15);animation:slideIn .25s ease;background:#fff;border-left:4px solid var(--accent)}
+.toast.ok{border-left-color:#1f5f5b;background:#eef6f5}
+.toast.err{border-left-color:#a12f2f;background:#fbeaea}
+.toast.warn{border-left-color:#a4560a;background:#fdf0e3}
+.toast.info{border-left-color:#274a8f;background:#e5edfb}
+@keyframes slideIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:none}}
+
+.act-btn{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:16px;font-size:11.5px;font-weight:600;border:none;cursor:pointer;margin:1px 2px;text-decoration:none;line-height:1.3}
+.act-btn.view{background:#e5edfb;color:#274a8f}
+.act-btn.view:hover{background:#d0dcf5}
+.act-btn.rename{background:#eef6f0;color:#1f5f5b}
+.act-btn.rename:hover{background:#dceee2}
+.act-btn.dl{background:#f5f0e6;color:#8a6d2b}
+.act-btn.dl:hover{background:#efe6d4}
+.act-btn.del{background:#fbeaea;color:#a12f2f}
+.act-btn.del:hover{background:#f5d6d6}
+.confirm-msg{font-size:14px;line-height:1.5;margin:0 0 8px}
+.confirm-msg .warn-text{color:#a12f2f;font-size:12.5px;margin-top:8px}
+
+</style>
+</head>
+<body>
+<div id="toastWrap"></div>
+<div class="header-bar">
+  <img src="hcc.png" alt="Logo" onerror="this.style.display='none'">
+  <div class="header-text">
+    <h1>Trung tâm Quản trị Hệ thống &amp; Phát triển Ứng dụng</h1>
+    <p class="sub">Phòng Quản trị &amp; Phát triển Nền tảng số</p>
+    <p class="title">Tổng hợp kết quả giải quyết TTHC định kỳ</p>
+  </div>
+</div>
+<main>
+  <div class="panel">
+    <h2>1. Tải file lên</h2>
+    <div class="drop" id="drop">Kéo–thả <strong>.xlsx / .xls</strong> vào đây, hoặc <strong>bấm để chọn</strong></div>
+    <input type="file" id="fileInput" multiple accept=".xlsx,.xls">
+    <table class="filelist" id="fileTable" style="display:none">
+      <thead><tr><th>#</th><th>Tên file</th><th>Mẫu</th><th>Đơn vị có số</th><th>Sheet</th><th></th></tr></thead>
+      <tbody id="fileTableBody"></tbody>
+    </table>
+    <div id="fileWarnings"></div>
+    <div class="row-actions">
+      <button class="primary" id="mergeBtn" disabled>Tổng hợp (cộng theo đơn vị)</button>
+      <button class="secondary" id="clearBtn" disabled>Xoá tất cả</button>
+    </div>
+  </div>
+  <div class="panel" id="reportTypePanel" style="display:none">
+    <h2>Chọn loại báo cáo</h2>
+    <div class="report-type">
+      <label><input type="radio" name="reportType" value="ky" checked> Theo kỳ (đầy đủ)</label>
+      <label><input type="radio" name="reportType" value="tuan"> Theo Tuần</label>
+    </div>
+  </div>
+  <div class="panel" id="resultPanel" style="display:none">
+    <h2>2. Kết quả final</h2>
+    <div class="stat-grid" id="statGrid"></div>
+    <div class="row-actions">
+      <button class="primary" id="downloadBtn">Tải Excel (.xlsx)</button>
+      <button class="secondary" id="previewBtn">Xem trước</button>
+      <button class="secondary" id="saveBtn">Lưu báo cáo</button>
+    </div>
+    <div class="note" id="colNote"></div>
+  </div>
+  <div class="panel">
+    <h2>3. Lịch sử báo cáo</h2>
+    <button class="secondary" id="loadHistoryBtn">Tải lịch sử</button>
+    <div id="historyBox" class="note" style="margin-top:10px">Chưa tải.</div>
+  </div>
+</main>
+<div class="modal-overlay" id="previewModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="previewTitle">Xem trước bảng tổng hợp</h3>
+      <button class="modal-close" id="closeModal">&times;</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+<div class="modal-overlay" id="saveNameModal">
+  <div class="modal small">
+    <div class="modal-header">
+      <h3>Lưu báo cáo</h3>
+      <button class="modal-close" id="closeSaveName">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label for="reportNameInput">Tên báo cáo</label>
+        <input type="text" id="reportNameInput" placeholder="Ví dụ: Báo cáo tuần 15–21/09/2026" maxlength="200">
+      </div>
+      <p class="note" style="margin:0">Tên này hiển thị trong lịch sử để dễ tìm lại.</p>
+    </div>
+    <div class="modal-footer">
+      <button class="secondary" id="cancelSaveName">Huỷ</button>
+      <button class="primary" id="confirmSaveName">Lưu</button>
+    </div>
+  </div>
+</div>
+<div class="modal-overlay" id="renameModal">
+  <div class="modal small">
+    <div class="modal-header">
+      <h3>Đổi tên báo cáo</h3>
+      <button class="modal-close" id="closeRename">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label for="renameInput">Tên mới</label>
+        <input type="text" id="renameInput" maxlength="200">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="secondary" id="cancelRename">Huỷ</button>
+      <button class="primary" id="confirmRename">Cập nhật</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="confirmModal">
+  <div class="modal small">
+    <div class="modal-header">
+      <h3 id="confirmTitle">Xác nhận</h3>
+      <button class="modal-close" id="closeConfirm">&times;</button>
+    </div>
+    <div class="modal-body">
+      <p class="confirm-msg" id="confirmMessage"></p>
+    </div>
+    <div class="modal-footer">
+      <button class="secondary" id="confirmCancel">Huỷ</button>
+      <button class="primary" id="confirmOk" style="background:#a12f2f">Xác nhận</button>
+    </div>
+  </div>
+</div>
+
+<footer>QT&PTNTS · bản <span id="buildId">2026-09-20-v3</span> — nếu không thấy chữ v3 trên header là đang chạy zip cũ</footer>
+<script src="app.js"></script>
+</body>
+</html>
